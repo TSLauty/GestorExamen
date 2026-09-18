@@ -1,42 +1,44 @@
 <?php
 require_once __DIR__ . "/../Pregunta.php";
+require_once __DIR__ . '/../../Pagina Web/conexion.php';
 
 class PreguntaDAL {
-    private string $usuario = 'root';
-    private string $contrasena = '1234';
-    private string $servidor = "localhost";
-    private string $basededatos = 'gestor_examenes';
+
+    private $conexion;
+
+    public function __construct() {
+        global $conexion;
+        $this->conexion = $conexion;
+    }
 
     public function insertPregunta(Pregunta $pregunta): void {
-        $conexion = mysqli_connect($this->servidor, $this->usuario, $this->contrasena, $this->basededatos) or die("Error al conectar: ");
-        mysqli_set_charset($conexion, 'utf8');
-
-        $respuestas = is_array($pregunta->getRespuestas()) ? json_encode($pregunta->getRespuestas()) : $pregunta->getRespuestas();
+        $respuestas = is_array($pregunta->getRespuestas())
+            ? json_encode($pregunta->getRespuestas())
+            : $pregunta->getRespuestas();
 
         $consulta = sprintf(
-            "INSERT INTO preguntas (tema, subtema, dificultad, textoPregunta, respuestas, respuestaCorrecta, apariciones) VALUES('%s', '%s', '%s', '%s', '%s', '%s', '%s');",
-            $pregunta->getTema(),
-            $pregunta->getSubtema(),
-            $pregunta->getDificultad(),
-            $pregunta->getTextoPregunta(),
-            mysqli_real_escape_string($conexion, $respuestas),
-            $pregunta->getRespuestaCorrecta(),
-            $pregunta->getApariciones()
+            "INSERT INTO preguntas (tema, subtema, dificultad, textoPregunta, respuestas, respuestaCorrecta, apariciones) VALUES('%s', '%s', '%s', '%s', '%s', '%s', '%s')",
+            $this->conexion->real_escape_string($pregunta->getTema()),
+            $this->conexion->real_escape_string($pregunta->getSubtema()),
+            $this->conexion->real_escape_string($pregunta->getDificultad()),
+            $this->conexion->real_escape_string($pregunta->getTextoPregunta()),
+            $this->conexion->real_escape_string($respuestas),
+            $this->conexion->real_escape_string($pregunta->getRespuestaCorrecta()),
+            $this->conexion->real_escape_string($pregunta->getApariciones())
         );
 
-        mysqli_query($conexion, $consulta);
-        $pregunta->setIdPregunta(mysqli_insert_id($conexion));
-        mysqli_close($conexion);
+        if (!$this->conexion->query($consulta)) {
+            die("Error al insertar pregunta: " . $this->conexion->error);
+        }
+
+        $pregunta->setIdPregunta($this->conexion->insert_id);
     }
 
     public function getPreguntas(): array {
-        $conexion = mysqli_connect($this->servidor, $this->usuario, $this->contrasena, $this->basededatos) or die("Error al conectar: ");
-        mysqli_set_charset($conexion, 'utf8');
-
-        $resultado = mysqli_query($conexion, "SELECT * FROM preguntas");
+        $resultado = $this->conexion->query("SELECT * FROM preguntas");
         $registros = [];
 
-        while ($registro = mysqli_fetch_array($resultado, MYSQLI_ASSOC)) {
+        while ($registro = $resultado->fetch_assoc()) {
             $pregunta = new Pregunta(
                 $registro["idPregunta"],
                 $registro["materia"] ?? '',
@@ -52,28 +54,23 @@ class PreguntaDAL {
             $registros[] = $pregunta;
         }
 
-        mysqli_close($conexion);
         return $registros;
     }
 
     public function obtenerPorTemaSubtemaDificultad(string $tema, string $subtema, string $dificultad, int $cantidad): array {
-        $conexion = mysqli_connect($this->servidor, $this->usuario, $this->contrasena, $this->basededatos) or die("Error al conectar: ");
-        mysqli_set_charset($conexion, 'utf8');
-
         $consulta = "SELECT * FROM preguntas WHERE tema = ? AND subtema = ? AND dificultad = ? ORDER BY apariciones ASC, RAND() LIMIT ?";
-        $stmt = mysqli_prepare($conexion, $consulta);
+        $stmt = $this->conexion->prepare($consulta);
 
         if ($stmt === false) {
-            mysqli_close($conexion);
             return [];
         }
 
-        mysqli_stmt_bind_param($stmt, 'sssi', $tema, $subtema, $dificultad, $cantidad);
-        mysqli_stmt_execute($stmt);
-        $resultado = mysqli_stmt_get_result($stmt);
+        $stmt->bind_param('sssi', $tema, $subtema, $dificultad, $cantidad);
+        $stmt->execute();
+        $resultado = $stmt->get_result();
 
         $registros = [];
-        while ($registro = mysqli_fetch_array($resultado, MYSQLI_ASSOC)) {
+        while ($registro = $resultado->fetch_assoc()) {
             $pregunta = new Pregunta(
                 $registro["idPregunta"],
                 $registro["materia"] ?? '',
@@ -89,8 +86,7 @@ class PreguntaDAL {
             $registros[] = $pregunta;
         }
 
-        mysqli_stmt_close($stmt);
-        mysqli_close($conexion);
+        $stmt->close();
         return $registros;
     }
 }
