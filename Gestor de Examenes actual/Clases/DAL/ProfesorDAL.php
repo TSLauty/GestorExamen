@@ -1,46 +1,41 @@
 <?php
-    require_once(__DIR__ . "/../Profesor.php");
+require_once __DIR__ . "/../Profesor.php";
+require_once __DIR__ . '/../../Pagina Web/conexion.php';
 
-    class ProfesorDAL {
-        private $usuario = 'root';
-        private $contrasena = '1234';
-        private $servidor = "localhost";
-        private $basededatos = 'gestor_examenes';
-    
-        public function insertProfesor($profesor) {
-            $conexion = mysqli_connect($this -> servidor, $this -> usuario, $this -> contrasena) or die ("Error al conectar: ");
-            mysqli_set_charset($conexion, 'utf8');
-            $baseDatos = mysqli_select_db($conexion, $this -> basededatos) or die ("Error seleccionar la BD: ");
+class ProfesorDAL {
 
-            $consulta = (sprintf("INSERT INTO profesores (idUsuario) VALUES('%s');",
-            $profesor -> getIdUsuario()));
+    private $conexion;
 
-            mysqli_query($conexion, $consulta);
-
-            $idProfesor = mysqli_insert_id($conexion);
-            $profesor -> setIdProfesor($idProfesor);
-            
-            mysqli_close($conexion);
-        }
-
-        public function getProfesores(): array {
-            $conexion = mysqli_connect($this -> servidor, $this -> usuario, $this -> contrasena) or die ("Error al conectar: ");
-            mysqli_set_charset($conexion, 'utf8');
-            $baseDatos = mysqli_select_db($conexion, $this -> basededatos) or die ("Error seleccionar la BD: ");
-
-            $consulta = (sprintf("SELECT * FROM profesores"));
-            $resultado = mysqli_query($conexion, $consulta);
-            $registros = array();
-
-            while($registro = mysqli_fetch_array($resultado)) {
-                $profesor = new Profesor ($registro["IdProfesor"], $registro["idUsuario"]);
-
-                $registros[] = $profesor;
-            } 
-            
-            mysqli_close($conexion);
-
-            return $registros;
-        }
+    public function __construct() {
+        global $conexion;
+        $this->conexion = $conexion;
     }
+
+    public function insertProfesor($profesor) {
+        $consulta = sprintf(
+            "INSERT INTO profesores (idUsuario) VALUES('%s')",
+            $this->conexion->real_escape_string($profesor->getIdUsuario())
+        );
+
+        if (!$this->conexion->query($consulta)) {
+            die("Error al insertar profesor: " . $this->conexion->error);
+        }
+
+        $idProfesor = $this->conexion->insert_id;
+        $profesor->setIdProfesor($idProfesor);
+    }
+
+    public function getProfesores(): array {
+        $consulta = "SELECT * FROM profesores";
+        $resultado = $this->conexion->query($consulta);
+        $registros = array();
+
+        while ($registro = $resultado->fetch_assoc()) {
+            $profesor = new Profesor($registro["idProfesor"], $registro["idUsuario"]);
+            $registros[] = $profesor;
+        }
+
+        return $registros;
+    }
+}
 ?>
