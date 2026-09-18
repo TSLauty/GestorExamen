@@ -1,10 +1,10 @@
 <?php
-$host = 'mysql.railway.internal';
-$user = 'root';
-$pass = 'VVgMlWdUZAtstBHsaVtVODCXLExXlQUq';
-$db   = 'railway';
-$port = 3306;
 
+$host = getenv('MYSQLHOST') ?: 'mysql.railway.internal';
+$user = getenv('MYSQLUSER') ?: 'root';
+$pass = getenv('MYSQLPASSWORD')'VVgMlWdUZAtstBHsaVtVODCXLExXlQUq';
+$db   = 'railway';
+$port = getenv('MYSQLPORT') ?: 3306;
 $conexion = new mysqli($host, $user, $pass, $db, $port);
 
 if ($conexion->connect_error) {
