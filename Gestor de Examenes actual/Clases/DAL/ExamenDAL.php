@@ -1,37 +1,37 @@
 <?php
 require_once __DIR__ . "/../Examen.php";
+require_once __DIR__ . '/../../Pagina Web/conexion.php';
 
 class ExamenDAL {
-    private string $usuario = 'root';
-    private string $contrasena = '1234';
-    private string $servidor = "localhost";
-    private string $basededatos = 'gestor_examenes';
+
+    private $conexion;
+
+    public function __construct() {
+        global $conexion;
+        $this->conexion = $conexion;
+    }
 
     public function insertExamen(Examen $examen): void {
-        $conexion = mysqli_connect($this->servidor, $this->usuario, $this->contrasena, $this->basededatos) or die("Error al conectar: ");
-        mysqli_set_charset($conexion, 'utf8');
-
         $consulta = sprintf(
-            "INSERT INTO examenes (tema, fechaExamen, enlaceAcceso, idProfesor) VALUES('%s', '%s', '%s', '%s');",
-            $examen->getTema(),
-            $examen->getFechaExamen()->format('Y-m-d H:i:s'),
-            $examen->getEnlaceAcceso(),
-            $examen->getIdProfesor()
+            "INSERT INTO examenes (tema, fechaExamen, enlaceAcceso, idProfesor) VALUES('%s', '%s', '%s', '%s')",
+            $this->conexion->real_escape_string($examen->getTema()),
+            $this->conexion->real_escape_string($examen->getFechaExamen()->format('Y-m-d H:i:s')),
+            $this->conexion->real_escape_string($examen->getEnlaceAcceso()),
+            $this->conexion->real_escape_string($examen->getIdProfesor())
         );
 
-        mysqli_query($conexion, $consulta);
-        $examen->setIdExamen(mysqli_insert_id($conexion));
-        mysqli_close($conexion);
+        if (!$this->conexion->query($consulta)) {
+            die("Error al insertar examen: " . $this->conexion->error);
+        }
+
+        $examen->setIdExamen($this->conexion->insert_id);
     }
 
     public function getExamenes(): array {
-        $conexion = mysqli_connect($this->servidor, $this->usuario, $this->contrasena, $this->basededatos) or die("Error al conectar: ");
-        mysqli_set_charset($conexion, 'utf8');
-
-        $resultado = mysqli_query($conexion, "SELECT * FROM examenes");
+        $resultado = $this->conexion->query("SELECT * FROM examenes");
         $registros = [];
 
-        while ($registro = mysqli_fetch_array($resultado, MYSQLI_ASSOC)) {
+        while ($registro = $resultado->fetch_assoc()) {
             $examen = new Examen(
                 $registro["idExamen"],
                 $registro["tema"],
@@ -43,7 +43,6 @@ class ExamenDAL {
             $registros[] = $examen;
         }
 
-        mysqli_close($conexion);
         return $registros;
     }
 }
