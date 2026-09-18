@@ -1,0 +1,2 @@
+[build.php-config]
+extensions = ["mysqli", "pdo_mysql"]
