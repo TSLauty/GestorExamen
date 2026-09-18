@@ -1,6 +1,6 @@
 <?php
     require_once(__DIR__ . "/../Usuario.php");
-require_once __DIR__ . '/../../../conexion.php';
+    require_once __DIR__ . '/../../Pagina Web/conexion.php';
 
     class UsuarioDAL {
      
