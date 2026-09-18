@@ -2,7 +2,7 @@
 $host = 'mysql.railway.internal';
 $user = 'root';
 $pass = 'VVgMlWdUZAtstBHsaVtVODCXLExXlQUq';
-$db   = 'gestor_examenes';
+$db   = 'railway';
 $port = 3306;
 
 $conexion = new mysqli($host, $user, $pass, $db, $port);
