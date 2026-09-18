@@ -1,11 +1,9 @@
 <?php
     require_once(__DIR__ . "/../Usuario.php");
+require_once __DIR__ . '/../../../conexion.php';
 
     class UsuarioDAL {
-        private $usuario = 'root';
-        private $contrasena = '1234';
-        private $servidor = "localhost";
-        private $basededatos = 'gestor_examenes';
+     
     
         public function insertUsuario($usuario) {
             $conexion = mysqli_connect($this -> servidor, $this -> usuario, $this -> contrasena) or die ("Error al conectar: ");
