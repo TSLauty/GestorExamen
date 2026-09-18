@@ -9,7 +9,7 @@ RUN echo "========== APACHE MODULES ==========" \
 
 RUN docker-php-ext-install mysqli pdo pdo_mysql
 
-COPY "Gestor de Examenes actual/Pagina Web/" /var/www/html/
+COPY ["Gestor de Examenes actual/Pagina Web/", "/var/www/html/"]
 
 RUN chown -R www-data:www-data /var/www/html
 
