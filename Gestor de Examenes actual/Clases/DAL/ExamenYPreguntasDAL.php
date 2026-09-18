@@ -1,46 +1,59 @@
 <?php
-    require_once("ExamenYPregunta.php");
+require_once __DIR__ . "/../ExamenYPregunta.php";
+require_once __DIR__ . '/../../Pagina Web/conexion.php';
 
-    class TutorDAL {
-        private $usuario = 'root';
-        private $contrasena = '1234';
-        private $servidor = "localhost";
-        private $basededatos = 'gestor_examenes';
-    
-        public function insertTutor($examenYPregunta) {
-            $conexion = mysqli_connect($this -> servidor, $this -> usuario, $this -> contrasena) or die ("Error al conectar: ");
-            mysqli_set_charset($conexion, 'utf8');
-            $baseDatos = mysqli_select_db($conexion, $this -> basededatos) or die ("Error seleccionar la BD: ");
+class ExamenYPreguntaDAL {
 
-            $consulta = (sprintf("INSERT INTO examenesYPreguntas (nombre, apellido) VALUES('%s', '%s');",
-            $examenYPregunta -> getNombre(), $examenYPregunta -> getApellido()));
+    private $conexion;
 
-            mysqli_query($conexion, $consulta);
-
-            $idTutor = mysqli_insert_id($conexion);
-            $examenYPregunta -> setIdTutor($idTutor);
-            
-            mysqli_close($conexion);
-        }
-
-        public function getTutores(): array {
-            $conexion = mysqli_connect($this -> servidor, $this -> usuario, $this -> contrasena) or die ("Error al conectar: ");
-            mysqli_set_charset($conexion, 'utf8');
-            $baseDatos = mysqli_select_db($conexion, $this -> basededatos) or die ("Error seleccionar la BD: ");
-
-            $consulta = (sprintf("SELECT * FROM examenesYPreguntas"));
-            $resultado = mysqli_query($conexion, $consulta);
-            $registros = array();
-
-            while($registro = mysqli_fetch_array($resultado)) {
-                $examenYPregunta = new Tutor ($registro["Id_Tutor"], $registro["nombre"], $registro["apellido"]);
-
-                $registros[] = $examenYPregunta;
-            } 
-            
-            mysqli_close($conexion);
-
-            return $registros;
-        }
+    public function __construct() {
+        global $conexion;
+        $this->conexion = $conexion;
     }
+
+    public function insertarRelacion($examenYPregunta) {
+        $consulta = sprintf(
+            "INSERT INTO examenesYPreguntas (idPregunta, idExamen) VALUES('%s', '%s')",
+            $this->conexion->real_escape_string($examenYPregunta->getIdPregunta()),
+            $this->conexion->real_escape_string($examenYPregunta->getIdExamen())
+        );
+
+        if (!$this->conexion->query($consulta)) {
+            die("Error al insertar relación: " . $this->conexion->error);
+        }
+
+        $examenYPregunta->setIdExamenYPreguntas($this->conexion->insert_id);
+    }
+
+    public function getRelaciones(): array {
+        $resultado = $this->conexion->query("SELECT * FROM examenesYPreguntas");
+        $registros = [];
+
+        while ($registro = $resultado->fetch_assoc()) {
+            $rel = new ExamenYPregunta(
+                $registro["idExamenYPreguntas"],
+                $registro["idPregunta"],
+                $registro["idExamen"]
+            );
+            $registros[] = $rel;
+        }
+
+        return $registros;
+    }
+
+    public function getPreguntasDeExamen($idExamen): array {
+        $idExamen = (int) $idExamen;
+        $resultado = $this->conexion->query(
+            "SELECT p.* FROM preguntas p
+             INNER JOIN examenesYPreguntas ep ON p.idPregunta = ep.idPregunta
+             WHERE ep.idExamen = $idExamen"
+        );
+
+        $preguntas = [];
+        while ($registro = $resultado->fetch_assoc()) {
+            $preguntas[] = $registro;
+        }
+        return $preguntas;
+    }
+}
 ?>
