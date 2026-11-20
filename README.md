@@ -110,4 +110,4 @@ Entre las entidades principales se encuentran:
 
 ## Autores
 
-Proyecto desarrollado por [TSLauty](https://github.com/TSLauty), [Kevin](https://github.com/kevin5626/), [Cesar](https://github.com/soyyocreeme2-blip/), [Leandro](https://github.com/gimenezleandro969-dot/).
+Proyecto desarrollado por [TSLauty](https://github.com/TSLauty), [Kevin](https://github.com/kevin5626/), [Cesar](https://github.com/soyyocreeme2-blip/), [Leandro](https://github.com/gimenezleandro959-dot/).
