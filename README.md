@@ -108,6 +108,6 @@ Entre las entidades principales se encuentran:
 - Pregunta
 - Resultado
 
-## Autor
+## Autores
 
-Proyecto desarrollado por [TSLauty](https://github.com/TSLauty), [Kevin](https://github.com/kevin5626/).
+Proyecto desarrollado por [TSLauty](https://github.com/TSLauty), [Kevin](https://github.com/kevin5626/), [Cesar](https://github.com/soyyocreeme2-blip/), [Leandro](https://github.com/gimenezleandro969-dot/).
