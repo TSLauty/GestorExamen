@@ -110,4 +110,4 @@ Entre las entidades principales se encuentran:
 
 ## Autor
 
-Proyecto desarrollado por [TSLauty](https://github.com/TSLauty).
+Proyecto desarrollado por [TSLauty](https://github.com/TSLauty), [Kevin](https://github.com/kevin5626/).
