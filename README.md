@@ -1,6 +1,6 @@
 # GestorExamen
 
-Aplicación web para la gestión de exámenes, preguntas y resultados académicos. Permite a profesores crear pruebas y consultar resultados, mientras que los alumnos pueden realizarlas y revisar sus calificaciones.
+Aplicación web para la gestión de exámenes, preguntas y resultados académicos. Permite a profesores crear pruebas y consultar resultados, mientras que los alumnos pueden realizarlas y revisar sus resultados.
 
 ## Funcionalidades
 
@@ -31,6 +31,7 @@ GestorExamen/
 │   ├── js/                  # Scripts JavaScript
 │   ├── estilos/             # Hojas de estilo CSS
 │   ├── imagenes/            # Recursos gráficos
+│   ├── db/                  # Script SQL de la base de datos
 │   └── diagramas/           # Diagramas UML y de datos
 ├── Carpeta_de_Campo_Gestor_Examenes/
 └── Daily_Scrum/
@@ -55,13 +56,13 @@ cd GestorExamen
 
 2. Mueve `gestor_examenes` al directorio público de tu servidor web o configura un virtual host para ese directorio.
 
-3. Crea la base de datos:
+3. Importa la base de datos incluida en el repositorio:
 
-```sql
-CREATE DATABASE gestor_examenes
-  CHARACTER SET utf8mb4
-  COLLATE utf8mb4_unicode_ci;
+```bash
+mysql -u root -p < "gestor_examenes/db/Codigo Base de Datos - Gestor Examenes.sql"
 ```
+
+El script crea la base `gestor_examenes`, sus tablas y carga las preguntas iniciales. También puedes ejecutarlo desde MySQL Workbench o phpMyAdmin.
 
 4. Configura la conexión MySQL mediante variables de entorno:
 
@@ -92,6 +93,7 @@ http://localhost/gestor_examenes/pagina_web/
 - [Diagrama UML](gestor_examenes/diagramas/Diagrama%20UML.png)
 - [Diagrama de casos de uso](gestor_examenes/diagramas/Diagrama%20de%20Casos%20de%20Uso.png)
 - [Diagrama de modelo de datos](gestor_examenes/diagramas/Diagrama%20de%20Modelo%20de%20Datos.png)
+- [Script de la base de datos](gestor_examenes/db/Codigo%20Base%20de%20Datos%20-%20Gestor%20Examenes.sql)
 - [Carpeta de campo](Carpeta_de_Campo_Gestor_Examenes/)
 - [Seguimiento Daily Scrum](Daily_Scrum/)
 
@@ -110,4 +112,4 @@ Entre las entidades principales se encuentran:
 
 ## Autores
 
-Proyecto desarrollado por [TSLauty](https://github.com/TSLauty), [Kevin](https://github.com/kevin5626/), [Cesar](https://github.com/soyyocreeme2-blip/), [Leandro](https://github.com/gimenezleandro959-dot/).
+Proyecto desarrollado por [TSLauty](https://github.com/TSLauty), [Kevin](https://github.com/kevin5626/), [Cesar](https://github.com/soyyocreeme2-blip/), [Leandro](https://github.com/gimenezleandro959-lab/).
